@@ -1,17 +1,18 @@
 ---
-title: "Inference Part 2"
+title: "Inference Part 2 V2"
 author: "Libardo Lopez"
-date: "Thursday, August 21, 2014"
+date: "Friday, August 22, 2014"
 output:
   html_document:
     keep_md: yes
 ---
+
 ```{r,init0, echo= FALSE, message=FALSE}
 library(knitr)
 opts_knit$set(fig.keep='high', fig.path='figures/', dev='png',
               warning=FALSE, message=FALSE)
 require(ggplot2)
-require("reshape2")
+require(reshape2)
 setwd("F:/2014/Coursera/Data Science/Inference/Week 3/Peer/.Rmds/Ex1")
 ```
 This is the second part of the statistical inference course project, which contains an analysis of the ToothGrowth data in the R datasets package.
@@ -25,16 +26,18 @@ The goal of this experiment is to see how Vitamin C administration affects the s
 
 1. Description of the data  
 
-The ToothGrowth data explores the effect of Vitamin C on Tooth Growth in Guinea Pigs: The **length** of teeth in each of 10 guinea pigs at each of three **dose** levels of Vitamin C: 0.5, 1, and 2 mg and with each of two delivery methods: orange juice (**OJ**) or ascorbic acid (**VC**).
+The ToothGrowth data explores the effect of Vitamin C on Tooth Growth in Guinea Pigs: The **length** of teeth in each of 10 guinea pigs at each of three **dose** levels of Vitamin C: 0.5, 1, and 2mg; low, med and high, respectively and with each of two delivery methods: orange juice (**OJ**) or ascorbic acid (**VC**).
 
 ```{r,init_load, echo= FALSE}
 data(ToothGrowth) # loads the dataset
+str(ToothGrowth)
+ToothGrowth$dose <- factor(ToothGrowth$dose, levels=c(0.5,1.0,2.0), labels=c("low","med","high")) #fix dose to a factor
 str(ToothGrowth)
 ```
 
 2. Basic Exploratory Data Analysis  
 
-To see the effect of the dose and the delivery method in the tooth growth, I grouped the info in order to have a boxplot graph.  
+To see the effect of the dose and the delivery method in the tooth growth, grouped the info in order to have a boxplot graph.  
 
 The plot shows a clear view of the performance of each group:
 
@@ -43,12 +46,19 @@ ToothGrowth$group<-paste(ToothGrowth$supp,ToothGrowth$dose,sep="")
 ggplot(ToothGrowth,aes(y=len, x=group, fill=group)) +
 ggtitle("Tooth growth with\ndifferent supplements and dose") + 
 geom_boxplot(width=1, outlier.colour="red",notch = FALSE,notchwidth = .5,alpha = 1, colour = "black") +
-scale_x_discrete(limits=c("VC0.5","OJ0.5","VC1","OJ1","VC2","OJ2"))
+scale_x_discrete(limits=c("VClow","OJlow","VCmed","OJmed","VChigh","OJhigh"))
 ```
 
-For the different dosage groups in the Vitamin C data, the lengths in each dosage group are tightly grouped about the mean, with low variance.  
-The range bars almost separate all three dosage groups distinctly, except for the small bar overlap between the lengths in the 1mg and 2mg dosage groups.  There are a potential outlier in the box plot 1mg dose.  
-The observation for OJ is almost similar, even if there is a difference on 2mg dose where the performance do not follow the trend and there are a potential outlier.  
+There appear to be differences between the means.   
+Variances don’t seem to be very similar.   
+Means don’t look significantly different, but similar spread in each group.  
+Similar spread within each group; means of low/ medium and low/high seem to be different. But there is overlap between med and high.  
+There seems to be no difference between supp at high dose.  
+There seems to be a main effect of dose – higher dose results in higher tooth length.  
+There doesn’t seem to be much of a main effect of supp – there is little difference between the 2 groups overall.   
+There are a potential outlier in the VC med dose.  
+There are a potential outlier in OJ high dose.  
+
 Since the sample groups seem to be so distinct in their grouping of tooth lengths, it can be **inferred** that there is a statistically significant effect of dosage on tooth length. 
 
 ```{r warning=FALSE, echo=FALSE}
@@ -61,6 +71,15 @@ ll<-tgmean-tgsd*1.96/sqrt(10) #lower limit
 ```
 
 2.1 Summary of the data  
+
+**Means** of simple main effects – i.e. each level of dose at each level of vitamin type:
+```{r means_summ, warning=FALSE, echo=FALSE}
+with(ToothGrowth, tapply(len, list(supp,dose), mean))
+```
+**Variance:**
+```{r var_summ, warning=FALSE, echo=FALSE}
+with(ToothGrowth, tapply(len, list(supp,dose), var))
+```
 
 Summary of length by supplemment, and by dose, including their 95% confidence interval.  
 
@@ -103,24 +122,24 @@ t.test(len ~ dose, data = ToothGrowth, subset= (per-test-subset)
 ```
 
 ```{r tests, echo=FALSE}
-td051all<-t.test(len ~ dose, subset= (dose==0.5 | dose == 1),  data = ToothGrowth)
-td051oj<-t.test(len ~ dose, subset= ((dose==0.5 | dose == 1)& supp=="OJ"), data = ToothGrowth)
-td051vc<-t.test(len ~ dose, subset= ((dose==0.5 | dose == 1)& supp=="VC"), data = ToothGrowth)
-td12all<-t.test(len ~ dose, subset= (dose==1 | dose == 2), data = ToothGrowth)
-td12oj<-t.test(len ~ dose,subset= ((dose==1 | dose == 2)& supp=="OJ"), data = ToothGrowth)
-td12vc<-t.test(len ~ dose, subset= ((dose==1 | dose == 2)& supp=="VC"), data = ToothGrowth)
+td051all<-t.test(len ~ dose, subset= (dose=="low" | dose == "med"),  data = ToothGrowth)
+td051oj<-t.test(len ~ dose, subset= ((dose=="low" | dose == "med")& supp=="OJ"), data = ToothGrowth)
+td051vc<-t.test(len ~ dose, subset= ((dose=="low" | dose == "med")& supp=="VC"), data = ToothGrowth)
+td12all<-t.test(len ~ dose, subset= (dose=="med" | dose == "high"), data = ToothGrowth)
+td12oj<-t.test(len ~ dose,subset= ((dose=="med" | dose == "high")& supp=="OJ"), data = ToothGrowth)
+td12vc<-t.test(len ~ dose, subset= ((dose=="med" | dose == "high")& supp=="VC"), data = ToothGrowth)
 ```
 
 3.3 Test Results Summary:  
 
  Test/Subset | Statistic | DF | P-value | 95% Conf. Interval | Mean diff. 
  --- | --- |--- | --- | --- | --- | ---
-0.5mg vs 1mg, OJ+VC| `r td051all$statistic` | `r td051all$parameter` |`r td051all$p.value` | `r td051all$conf.int` | `r diff(td051all$estimate)`
-1mg vs 2mg, OJ+VC| `r td12all$statistic` | `r td12all$parameter` |`r td12all$p.value` | `r td12all$conf.int` | `r diff(td12all$estimate)`
-0.5mg vs 1mg, OJ| `r td051oj$statistic` | `r td051oj$parameter` |`r td051oj$p.value` | `r td051oj$conf.int` | `r diff(td051oj$estimate)`
-1mg vs 2mg, OJ| `r td12oj$statistic` | `r td12oj$parameter` |`r td12oj$p.value` | `r td12oj$conf.int` | `r diff(td12oj$estimate)`
-0.5mg vs 1mg, VC| `r td051vc$statistic` | `r td051vc$parameter` |`r td051vc$p.value` | `r td051vc$conf.int` | `r diff(td051vc$estimate)`
-1mg vs 2mg, VC| `r td12vc$statistic` | `r td12vc$parameter` |`r td12vc$p.value` | `r td12vc$conf.int` | `r diff(td12vc$estimate)`
+low vs med, OJ+VC| `r td051all$statistic` | `r td051all$parameter` |`r td051all$p.value` | `r td051all$conf.int` | `r diff(td051all$estimate)`
+med vs high, OJ+VC| `r td12all$statistic` | `r td12all$parameter` |`r td12all$p.value` | `r td12all$conf.int` | `r diff(td12all$estimate)`
+low vs med, OJ| `r td051oj$statistic` | `r td051oj$parameter` |`r td051oj$p.value` | `r td051oj$conf.int` | `r diff(td051oj$estimate)`
+med vs high, OJ| `r td12oj$statistic` | `r td12oj$parameter` |`r td12oj$p.value` | `r td12oj$conf.int` | `r diff(td12oj$estimate)`
+low vs med, VC| `r td051vc$statistic` | `r td051vc$parameter` |`r td051vc$p.value` | `r td051vc$conf.int` | `r diff(td051vc$estimate)`
+med vs high, VC| `r td12vc$statistic` | `r td12vc$parameter` |`r td12vc$p.value` | `r td12vc$conf.int` | `r diff(td12vc$estimate)`
 
 4 Test Conclusions:  
 
