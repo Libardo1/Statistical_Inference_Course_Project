@@ -85,12 +85,12 @@ Summary of length by supplemment, and by dose, including their 95% confidence in
 
  Dose (mg) | Supp. | Avg Length | Std deviation | 95% lower limit | 95% upper limit
 --- | --- |--- | --- | --- | ---
-0.5 | VC | `r tgmean[4]`| `r tgsd[4]` | `r ll[4]` | `r ul[4]`
-0.5 | OJ |  `r tgmean[1]`| `r tgsd[1]` | `r ll[1]` | `r ul[1]`
-1.0 | VC |  `r tgmean[5]`| `r tgsd[5]` | `r ll[5]` | `r ul[5]`
-1.0 | OJ | `r tgmean[2]`| `r tgsd[2]` | `r ll[2]` | `r ul[2]`
-2.0 | VC |  `r tgmean[6]`| `r tgsd[6]` | `r ll[6]` | `r ul[6]`
-2.0 | OJ |  `r tgmean[3]`| `r tgsd[3]` | `r ll[3]` | `r ul[3]`
+low | VC | `r tgmean[4]`| `r tgsd[4]` | `r ll[4]` | `r ul[4]`
+low | OJ |  `r tgmean[1]`| `r tgsd[1]` | `r ll[1]` | `r ul[1]`
+med | VC |  `r tgmean[5]`| `r tgsd[5]` | `r ll[5]` | `r ul[5]`
+med | OJ | `r tgmean[2]`| `r tgsd[2]` | `r ll[2]` | `r ul[2]`
+high| VC |  `r tgmean[6]`| `r tgsd[6]` | `r ll[6]` | `r ul[6]`
+high| OJ |  `r tgmean[3]`| `r tgsd[3]` | `r ll[3]` | `r ul[3]`
 
 3. Hypothesis Tests:  
 
